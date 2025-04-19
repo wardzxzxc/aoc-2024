@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -22,51 +23,24 @@ func main() {
 }
 
 func part1() {
-	scanner := getScannerPtr()
+	scanner := commons.GetInputFileScannerPtr()
 	defer scanner.Close()
 	numOfReports := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
 		numbersString := strings.Fields(line)
-		var direction int // 0 for negative, 1 for positive
-		for idx, numStr := range numbersString {
-			if idx != 0 {
-				num, _ := strconv.Atoi(numStr)
-				prevNumStr := numbersString[idx-1]
-				prevNum, _ := strconv.Atoi(prevNumStr)
+		report := make([]int, 0, len(numbersString))
+		for _, numStr := range numbersString {
+			num, _ := strconv.Atoi(numStr)
+			report = append(report, num)
+		}
 
-				diff := prevNum - num
-
-				if idx == 1 {
-					if diff < 0 {
-						direction = 0
-					} else {
-						direction = 1
-					}
-				} else {
-					if diff < 0 && direction == 1 {
-						break
-					}
-					if diff > 0 && direction == 0 {
-						break
-					}
-				}
-
-				if diff < 0 {
-					diff = diff * -1
-				}
-
-				if diff > 3 || diff < 1 {
-					break
-				}
-
-				if idx == len(numbersString)-1 {
-					numOfReports += 1
-				}
-			}
+		if isReportSafe(report) {
+			numOfReports += 1
 		}
 	}
+
 	fmt.Println(numOfReports)
 }
 
@@ -86,7 +60,7 @@ func isReportSafe(report []int) bool {
 }
 
 func part2() {
-	scanner := getScannerPtr()
+	scanner := commons.GetInputFileScannerPtr()
 	defer scanner.Close()
 
 	numReports := 0
@@ -124,7 +98,12 @@ func part2() {
 }
 
 func getScannerPtr() *FileScanner {
-	file, err := os.Open("input.txt")
+	path, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+	}
+	inputFilePath := path + "/input.txt"
+	file, err := os.Open(inputFilePath)
 	if err != nil {
 		fmt.Println("Error reading input")
 		fmt.Println(err)
