@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -10,6 +11,72 @@ import (
 
 func main() {
 	part1()
+}
+
+type DigitNumbers struct {
+	X int
+	Y int
+}
+
+func getDigitNumbers(startIdx int, runes []rune) (*DigitNumbers, error) {
+	var firstNumRunes []rune
+	validFirstNum := true
+	for i := 0; i < 4; i++ {
+		currentRune := runes[startIdx+i]
+
+		if i == 0 && !commons.IsNumeric(currentRune) {
+			validFirstNum = false
+			break
+		}
+
+		if i > 0 && !commons.IsNumeric(currentRune) && currentRune != ',' {
+			validFirstNum = false
+			break
+		}
+
+		if i > 0 && currentRune == ',' {
+			break
+		}
+
+		firstNumRunes = append(firstNumRunes, currentRune)
+	}
+
+	if !validFirstNum {
+		return nil, errors.New("Invalid First Digit Number")
+	} else {
+		secondIdx := startIdx + len(firstNumRunes) + 1
+		var secondNumRunes []rune
+		validSecondNum := true
+
+		for i := 0; i < 4; i++ {
+			currentRune := runes[secondIdx+i]
+
+			if i == 0 && !commons.IsNumeric(currentRune) {
+				validSecondNum = false
+				break
+			}
+
+			if i > 0 && !commons.IsNumeric(currentRune) && currentRune != ')' {
+				validSecondNum = false
+				break
+			}
+
+			if i > 0 && currentRune == ')' {
+				break
+			}
+
+			secondNumRunes = append(secondNumRunes, currentRune)
+		}
+		if validSecondNum {
+			secondNumStr := string(secondNumRunes)
+			secondNum, _ := strconv.Atoi(secondNumStr)
+			firstNumStr := string(firstNumRunes)
+			firstNum, _ := strconv.Atoi(firstNumStr)
+			return &DigitNumbers{firstNum, secondNum}, nil
+		} else {
+			return nil, errors.New("Invalid Second Digit Number")
+		}
+	}
 }
 
 func part1() {
@@ -26,70 +93,17 @@ func part1() {
 
 		for _, match := range matches {
 			firstIdx := match[1]
-
-			var firstNumRunes []rune
 			runes := []rune(line)
-			validFirstNum := true
 
-			// Max length including comma is 4
-			for i := 0; i < 4; i++ {
-				currentRune := runes[firstIdx+i]
-
-				if i == 0 && !commons.IsNumeric(currentRune) {
-					validFirstNum = false
-					break
-				}
-
-				if i > 0 && !commons.IsNumeric(currentRune) && currentRune != ',' {
-					validFirstNum = false
-					break
-				}
-
-				if i > 0 && currentRune == ',' {
-					break
-				}
-
-				firstNumRunes = append(firstNumRunes, currentRune)
+			digitNumbersPtr, err := getDigitNumbers(firstIdx, runes)
+			if err != nil {
+				continue
+			} else {
+				total += digitNumbersPtr.X * digitNumbersPtr.Y
 			}
 
-			if validFirstNum {
-				firstNumStr := string(firstNumRunes)
-				firstNum, _ := strconv.Atoi(firstNumStr)
-				fmt.Println(firstNum)
-				// secondIdx is firstIdx plus length of firstNum and comma
-				secondIdx := firstIdx + len(firstNumRunes) + 1
-				var secondNumRunes []rune
-				validSecondNum := true
-
-				for i := 0; i < 4; i++ {
-
-					currentRune := runes[secondIdx+i]
-
-					if i == 0 && !commons.IsNumeric(currentRune) {
-						validSecondNum = false
-						break
-					}
-
-					if i > 0 && !commons.IsNumeric(currentRune) && currentRune != ')' {
-						validSecondNum = false
-						break
-					}
-
-					if i > 0 && currentRune == ')' {
-						break
-					}
-
-					secondNumRunes = append(secondNumRunes, currentRune)
-
-				}
-
-				if validSecondNum {
-					secondNumStr := string(secondNumRunes)
-					secondNum, _ := strconv.Atoi(secondNumStr)
-					total += firstNum * secondNum
-				}
-			}
 		}
 	}
+
 	fmt.Println(total)
 }
