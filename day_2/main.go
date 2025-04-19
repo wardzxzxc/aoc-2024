@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strconv"
@@ -11,11 +10,6 @@ import (
 
 	"github.com/wardzxzxc/aoc-2024/commons"
 )
-
-type FileScanner struct {
-	io.Closer
-	*bufio.Scanner
-}
 
 func main() {
 	part1()

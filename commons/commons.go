@@ -35,3 +35,7 @@ func GetInputFileScannerPtr() *FileScanner {
 	scanner := bufio.NewScanner(file)
 	return &FileScanner{file, scanner}
 }
+
+func IsNumeric(r rune) bool {
+	return r >= '0' && r <= '9'
+}
