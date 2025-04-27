@@ -2,9 +2,7 @@ package commons
 
 import (
 	"bufio"
-	"fmt"
 	"io"
-	"log"
 	"os"
 )
 
@@ -23,14 +21,12 @@ func Abs(x int) int {
 func GetInputFileScannerPtr() *FileScanner {
 	path, err := os.Getwd()
 	if err != nil {
-		log.Println(err)
+		panic(err)
 	}
 	inputFilePath := path + "/input.txt"
 	file, err := os.Open(inputFilePath)
 	if err != nil {
-		fmt.Println("Error reading input")
-		fmt.Println(err)
-		os.Exit(1)
+		panic(err)
 	}
 	scanner := bufio.NewScanner(file)
 	return &FileScanner{file, scanner}
