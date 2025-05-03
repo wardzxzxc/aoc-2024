@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
-	"os"
 	"strconv"
 	"strings"
 
@@ -89,20 +86,4 @@ func part2() {
 		}
 	}
 	fmt.Println(extraReports + numReports)
-}
-
-func getScannerPtr() *FileScanner {
-	path, err := os.Getwd()
-	if err != nil {
-		log.Println(err)
-	}
-	inputFilePath := path + "/input.txt"
-	file, err := os.Open(inputFilePath)
-	if err != nil {
-		fmt.Println("Error reading input")
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	scanner := bufio.NewScanner(file)
-	return &FileScanner{file, scanner}
 }
