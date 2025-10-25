@@ -11,6 +11,7 @@ import (
 
 func main() {
 	part1()
+	part2()
 }
 
 func getOrderRulesArrAndPagesArr(scanner *commons.FileScanner) (*map[string][]string, *[][]string) {
@@ -33,37 +34,44 @@ func getOrderRulesArrAndPagesArr(scanner *commons.FileScanner) (*map[string][]st
 	return &orderRules, &pagesArr
 }
 
+func checkIsValid(pagesPtr *[]string, orderRulesPtr *map[string][]string) bool {
+	pages := *pagesPtr
+	orderRules := *orderRulesPtr
+	isValid := true
+	length := len(pages)
+
+	for i, pageNum := range pages {
+		orders := orderRules[pageNum]
+		// If no order for that page, consider sequence not valid
+		if len(orders) == 0 {
+			isValid = false
+			break
+		}
+
+		// Go through each remaining pageNum and check
+		for j := i + 1; j < length-1; j++ {
+			if !slices.Contains(orders, pages[j]) {
+				isValid = false
+			}
+		}
+		if !isValid {
+			return isValid
+		}
+	}
+	return isValid
+}
+
 func part1() {
 	scanner := commons.GetInputFileScannerPtr()
 	defer scanner.Close()
 	orderRulesPtr, pagesArrPtr := getOrderRulesArrAndPagesArr(scanner)
-	orderRules := *orderRulesPtr
 	pagesArr := *pagesArrPtr
 	isValid := true
 	totalSum := 0
 
 	for _, pages := range pagesArr {
 		length := len(pages)
-		for i, pageNum := range pages {
-			orders := orderRules[pageNum]
-			// If no order for that page, consider sequence not valid
-			if len(orders) == 0 {
-				isValid = false
-				break
-			}
-
-			// Go through each remaining pageNum and check
-			for j := i + 1; j < length-1; j++ {
-				if !slices.Contains(orders, pages[j]) {
-					isValid = false
-				}
-			}
-			if !isValid {
-				// Skip the rest of the pages and go to the next sequence
-				break
-			}
-		}
-
+		isValid = checkIsValid(&pages, orderRulesPtr)
 		if isValid {
 			var midIdx int
 			if length%2 == 1 {
@@ -78,6 +86,42 @@ func part1() {
 		}
 
 		isValid = true
+	}
+
+	fmt.Println(totalSum)
+}
+
+func getMiddleNumberFromUnordered(orderRulesPtr *map[string][]string, pagesPtr *[]string) int {
+	pages := *pagesPtr
+	gapToMiddle := len(pages) / 2
+	orderRules := *orderRulesPtr
+	pageNumInt := -1
+	for _, pageNum := range pages {
+		orders := orderRules[pageNum]
+		intersect := commons.FindIntersectionStr(orders, pages)
+		if len(intersect) == gapToMiddle {
+			pageNumInt, _ = strconv.Atoi(pageNum)
+			return pageNumInt
+		}
+	}
+	return pageNumInt
+}
+
+func part2() {
+	scanner := commons.GetInputFileScannerPtr()
+	defer scanner.Close()
+	orderRulesPtr, pagesArrPtr := getOrderRulesArrAndPagesArr(scanner)
+	pagesArr := *pagesArrPtr
+	isValid := true
+	totalSum := 0
+
+	for _, pages := range pagesArr {
+		isValid = checkIsValid(&pages, orderRulesPtr)
+		if !isValid {
+			midNum := getMiddleNumberFromUnordered(orderRulesPtr, &pages)
+			totalSum += midNum
+		}
+
 	}
 
 	fmt.Println(totalSum)
