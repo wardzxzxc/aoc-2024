@@ -35,3 +35,39 @@ func GetInputFileScannerPtr() *FileScanner {
 func IsNumeric(r rune) bool {
 	return r >= '0' && r <= '9'
 }
+
+func FindIntersectionStr(arr1 []string, arr2 []string) []string {
+	var result []string
+
+	set := make(map[string]struct{})
+
+	for _, v := range arr2 {
+		set[v] = struct{}{}
+	}
+
+	for _, v := range arr1 {
+		if _, ok := set[v]; ok {
+			result = append(result, v)
+		}
+	}
+
+	return result
+}
+
+func FindIntersectionInt(arr1 []int, arr2 []int) []int {
+	var result []int
+
+	set := make(map[int]struct{})
+
+	for _, v := range arr2 {
+		set[v] = struct{}{}
+	}
+
+	for _, v := range arr1 {
+		if _, ok := set[v]; ok {
+			result = append(result, v)
+		}
+	}
+
+	return result
+}
